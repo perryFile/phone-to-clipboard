@@ -85,6 +85,49 @@ Your phone and computer must be on the **same Wi-Fi network**.
 
 ---
 
+## Windows tutorial (download + run)
+
+Follow this on a Windows PC.
+
+1. Install Git: https://git-scm.com/download/win
+2. Install Python 3.11+ (check **Add Python to PATH**): https://www.python.org/downloads/windows/
+3. Open PowerShell and run:
+
+```powershell
+git clone https://github.com/perryFile/phone-to-clipboard.git
+cd phone-to-clipboard
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+phone-to-clipboard
+```
+
+If PowerShell blocks activation, run once as admin:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+Then retry:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Optional: run from any folder without activating the venv every time:
+
+```powershell
+setx PATH "$env:PATH;$PWD\.venv\Scripts"
+```
+
+Close and reopen PowerShell after `setx`, then run:
+
+```powershell
+phone-to-clipboard
+```
+
+---
+
 ## HTTPS (recommended for camera access)
 
 Most phone browsers require HTTPS to access the camera. Set it up once with `mkcert`:
@@ -161,3 +204,5 @@ PYTHONPATH= .venv/bin/pytest tests/ -q
 - Added a Linux clipboard compatibility fallback that converts JPEG uploads to PNG before copy on Wayland/X11.
 - Bumped service worker cache version so phones pick up frontend fixes immediately.
 - Added an optional global `phone-to-clipboard` command so the app can be started from any folder.
+- Improved Windows clipboard reliability by running PowerShell in STA mode for image/text clipboard operations.
+- Added a full Windows download/setup/run tutorial.

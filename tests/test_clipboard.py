@@ -146,3 +146,15 @@ class TestCopyToClipboard:
 
         cmd = mock_run.call_args[0][0]
         assert cmd[0] == "powershell"
+        assert "-STA" in cmd
+
+    def test_windows_image_calls_powershell(self, monkeypatch):
+        monkeypatch.setattr("app.clipboard.sys.platform", "win32")
+
+        with patch("app.clipboard.subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0, stderr=b"")
+            copy_to_clipboard(b"fakepng", "image/png")
+
+        cmd = mock_run.call_args[0][0]
+        assert cmd[0] == "powershell"
+        assert "-STA" in cmd

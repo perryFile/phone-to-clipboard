@@ -13,6 +13,35 @@ class ClipboardError(RuntimeError):
     """Raised when the clipboard write fails."""
 
 
+def _powershell_executable() -> str:
+    """Return a usable PowerShell executable.
+
+    On Windows, prefer the built-in name directly. On non-Windows systems
+    (for tests/compat), resolve any available PowerShell binary.
+    """
+    if sys.platform == "win32":
+        return "powershell"
+
+    for name in ("powershell", "powershell.exe", "pwsh", "pwsh.exe"):
+        path = shutil.which(name)
+        if path:
+            return path
+
+    raise ClipboardError("PowerShell not found in PATH")
+
+
+def _powershell_cmd(script: str) -> list[str]:
+    """Build a PowerShell command suitable for clipboard operations."""
+    return [
+        _powershell_executable(),
+        "-NoProfile",
+        "-NonInteractive",
+        "-STA",
+        "-Command",
+        script,
+    ]
+
+
 def _detect_session() -> str:
     """Return 'windows', 'wayland', 'x11', or raise ClipboardError."""
     if sys.platform == "win32":
@@ -114,11 +143,7 @@ def _copy_windows(image_bytes: bytes, mime_type: str = "image/png") -> None:
             "$img.Dispose()"
         )
     try:
-        result = subprocess.run(
-            ["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
-            capture_output=True,
-            timeout=15,
-        )
+        result = subprocess.run(_powershell_cmd(script), capture_output=True, timeout=15)
     except subprocess.TimeoutExpired as exc:
         raise ClipboardError(f"PowerShell clipboard timed out: {exc}") from exc
     except OSError as exc:
@@ -141,11 +166,7 @@ def _copy_text_windows(text: str) -> None:
     )
 
     try:
-        result = subprocess.run(
-            ["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
-            capture_output=True,
-            timeout=15,
-        )
+        result = subprocess.run(_powershell_cmd(script), capture_output=True, timeout=15)
     except subprocess.TimeoutExpired as exc:
         raise ClipboardError(f"PowerShell clipboard timed out: {exc}") from exc
     except OSError as exc:
