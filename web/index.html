@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#111111" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AirDrop Linux" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <title>AirDrop Linux</title>
+
+  <!-- Inline styles — no CDN, works offline once cached -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #111;
+      --surface:   #1e1e1e;
+      --accent:    #4f8ef7;
+      --success:   #34c759;
+      --error:     #ff3b30;
+      --text:      #f5f5f7;
+      --text-dim:  #8e8e93;
+      --radius:    18px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      padding: 24px 24px env(safe-area-inset-bottom, 24px);
+      min-height: 100dvh;
+    }
+
+    header { text-align: center; }
+    header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+    header p  { margin-top: 6px; font-size: 0.9rem; color: var(--text-dim); }
+
+    /* ---- Camera button ---- */
+    #camera-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    #camera-label:active { transform: scale(0.93); opacity: 0.85; }
+    #camera-label.disabled { opacity: 0.45; pointer-events: none; }
+
+    #camera-label svg {
+      width: 72px;
+      height: 72px;
+      fill: white;
+    }
+
+    /* Hidden file inputs */
+    #photo-input,
+    #upload-input { display: none; }
+
+    /* ---- Upload-from-library button ---- */
+    #upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 50px;
+      background: var(--surface);
+      border: 2px solid rgba(255,255,255,0.12);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    #upload-label:active { transform: scale(0.96); background: #2a2a2a; }
+    #upload-label.disabled { opacity: 0.45; pointer-events: none; }
+    #upload-label svg { width: 22px; height: 22px; fill: var(--accent); flex-shrink: 0; }
+
+    /* ---- Text sender ---- */
+    .text-wrap {
+      width: min(92vw, 380px);
+      display: grid;
+      gap: 10px;
+    }
+    #text-input {
+      width: 100%;
+      min-height: 90px;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,0.12);
+      background: var(--surface);
+      color: var(--text);
+      padding: 12px 14px;
+      font-size: 0.96rem;
+      resize: vertical;
+      outline: none;
+    }
+    #text-input:focus {
+      border-color: var(--accent);
+    }
+    #text-send-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 20px;
+      background: #2f6ee0;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    #text-send-btn:active { transform: scale(0.98); }
+    #text-send-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ---- Status ---- */
+    #status {
+      min-height: 56px;
+      text-align: center;
+      font-size: 1rem;
+      line-height: 1.5;
+      transition: opacity 0.2s;
+    }
+
+    #status.idle  { color: var(--text-dim); }
+    #status.loading { color: var(--text); }
+    #status.ok    { color: var(--success); font-weight: 600; }
+    #status.error { color: var(--error); }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- Add-to-home-screen banner ---- */
+    #a2hs-banner {
+      display: none;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      max-width: 320px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    #a2hs-banner strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📸 AirDrop Linux</h1>
+    <p>Take a photo or upload from your library — it lands in your clipboard.</p>
+  </header>
+
+  <!-- Camera button -->
+  <label id="camera-label" for="photo-input" role="button" aria-label="Take photo">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5 3.5 3.5 0 0 1 15.5 12 3.5
+               3.5 0 0 1 12 15.5M23 4h-4.18L17 2H7L5.18 4H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2
+               2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z"/>
+    </svg>
+  </label>
+
+  <!-- Hidden file input: forces camera on iOS -->
+  <input type="file" id="photo-input" accept="image/*" capture="environment" />
+
+  <!-- Upload from library button -->
+  <label id="upload-label" for="upload-input" role="button" aria-label="Upload from library">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/>
+    </svg>
+    Upload from library
+  </label>
+
+  <!-- Hidden file input: opens photo picker (no capture attr) -->
+  <input type="file" id="upload-input" accept="image/*" />
+
+  <div id="status" class="idle">Tap a button to get started.</div>
+
+  <div class="text-wrap">
+    <textarea id="text-input" maxlength="50000" placeholder="Send text to your Linux clipboard..."></textarea>
+    <button id="text-send-btn" type="button">Send text to clipboard</button>
+  </div>
+
+  <!-- Add to home screen suggestion -->
+  <div id="a2hs-banner">
+    <strong>Tip:</strong> Tap the Share icon in Safari, then
+    <strong>Add to Home Screen</strong> for one-tap access.
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+[Unit]
+Description=airdrop-linux — iPhone to Linux clipboard
+Documentation=https://github.com/you/airdrop_linux
+After=network-online.target graphical-session.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Documents/airdrop_linux
+ExecStart=%h/Documents/airdrop_linux/.venv/bin/python -m app.main \
+    --ssl-keyfile %h/Documents/airdrop_linux/certs/key.pem \
+    --ssl-certfile %h/Documents/airdrop_linux/certs/cert.pem
+Restart=on-failure
+RestartSec=5
+
+# Make sure the graphical session env vars are available so clipboard tools
+# can connect to the Wayland/X11 display.
+# For GNOME on Wayland these are typically set when the session starts.
+# If the service fails to detect the display, run:
+#   systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_SESSION_TYPE
+# and restart this unit.
+PassEnvironment=DISPLAY WAYLAND_DISPLAY XDG_SESSION_TYPE XDG_RUNTIME_DIR
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
