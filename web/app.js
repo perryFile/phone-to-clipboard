@@ -237,6 +237,9 @@
   if (label) {
     label.addEventListener("click", function () {
       sendClientLog("camera_opened", "camera button tapped");
+      // Reset so selecting/capturing again always triggers a change event.
+      input.value = "";
+      input.click();
     });
   }
 

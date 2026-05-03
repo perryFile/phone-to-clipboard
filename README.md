@@ -49,7 +49,37 @@ pip install -e ".[dev]"
 ./run.sh
 ```
 
-The server starts on port **8000**. A QR code is printed in the terminal — scan it with your phone.
+The server starts on port **8765** by default. A QR code is printed in the terminal — scan it with your phone.
+
+---
+
+## Start from anywhere (no `cd` needed)
+
+This is optional and does **not** enable autostart.
+
+After the first install, register the CLI command once:
+
+```bash
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+Then you can launch from any folder (while your venv is active):
+
+```bash
+phone-to-clipboard
+```
+
+If you want this to work even without manually activating the venv each time:
+
+```bash
+mkdir -p ~/.local/bin
+ln -sf "$PWD/.venv/bin/phone-to-clipboard" ~/.local/bin/phone-to-clipboard
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+Now `phone-to-clipboard` works from anywhere and still only runs when you start it.
 
 Your phone and computer must be on the **same Wi-Fi network**.
 
@@ -79,7 +109,7 @@ After starting the server:
 | **Send text** | Type in the text box, tap "Send text to clipboard" |
 | **Paste** | Press Ctrl+V on your desktop |
 
-The pairing page is also available at `http://<your-ip>:8000/pair` if QR scanning isn't working.
+The pairing page is also available at `http://<your-ip>:8765/pair` if QR scanning isn't working.
 
 ---
 
@@ -120,3 +150,14 @@ PYTHONPATH= .venv/bin/pytest tests/ -q
 | Linux — Wayland | `wl-copy` |
 | Linux — X11 | `xclip` |
 | Windows | PowerShell `Set-Clipboard` |
+
+---
+
+## Changelog
+
+### 2026-05-03
+
+- Fixed iPhone "Take photo" reliability by switching to an explicit camera button click flow.
+- Added a Linux clipboard compatibility fallback that converts JPEG uploads to PNG before copy on Wayland/X11.
+- Bumped service worker cache version so phones pick up frontend fixes immediately.
+- Added an optional global `phone-to-clipboard` command so the app can be started from any folder.

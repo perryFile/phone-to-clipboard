@@ -56,6 +56,8 @@
       width: 200px;
       height: 200px;
       border-radius: 50%;
+      border: none;
+      padding: 0;
       background: var(--accent);
       cursor: pointer;
       transition: transform 0.15s ease, opacity 0.15s ease;
@@ -182,13 +184,13 @@
   </header>
 
   <!-- Camera button -->
-  <label id="camera-label" for="photo-input" role="button" aria-label="Take photo">
+  <button id="camera-label" type="button" aria-label="Take photo">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5 3.5 3.5 0 0 1 15.5 12 3.5
                3.5 0 0 1 12 15.5M23 4h-4.18L17 2H7L5.18 4H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2
                2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z"/>
     </svg>
-  </label>
+  </button>
 
   <!-- Hidden file input: forces camera on iOS -->
   <input type="file" id="photo-input" accept="image/*" capture="environment" />

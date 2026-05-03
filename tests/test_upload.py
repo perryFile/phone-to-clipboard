@@ -114,6 +114,19 @@ class TestUploadValidation:
         assert resp.status_code == 200
         assert resp.json()["status"] == "ok"
 
+    def test_linux_session_forces_png_clipboard_for_jpeg(self, client, token):
+        with patch("app.main.session_type", return_value="wayland"), \
+             patch("app.main.copy_to_clipboard") as mock_clip:
+            resp = client.post(
+                f"/upload?t={token}",
+                files={"photo": ("photo.jpg", _jpeg_bytes(), "image/jpeg")},
+            )
+
+        assert resp.status_code == 200
+        assert mock_clip.call_count == 1
+        _bytes, mime = mock_clip.call_args[0]
+        assert mime == "image/png"
+
 
 class TestTextUpload:
     def test_text_upload_missing_token_returns_401(self, client):

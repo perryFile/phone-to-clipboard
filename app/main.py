@@ -25,7 +25,7 @@ from pydantic import BaseModel
 
 from .auth import load_or_create_token, rotate_token, verify_token
 from .clipboard import ClipboardError, copy_text_to_clipboard, copy_to_clipboard, session_type
-from .images import ImageError, heif_available, to_clipboard_image
+from .images import ImageError, heif_available, to_clipboard_image, to_png_bytes
 from .net import get_lan_ip, get_mdns_hostname, is_public_ip
 
 # ---------------------------------------------------------------------------
@@ -162,6 +162,25 @@ async def upload_photo(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     _record_event("image_convert", True, f"image ready as {mime_type}", ip=client_ip, size=len(image_data))
+
+    # Some Linux paste targets only accept image/png from clipboard providers.
+    # Keep Windows fast-path JPEG handling, but force PNG on Wayland/X11.
+    try:
+        sess = session_type()
+    except Exception:
+        sess = "unknown"
+
+    if mime_type == "image/jpeg" and sess in ("wayland", "x11"):
+        image_data = to_png_bytes(raw)
+        mime_type = "image/png"
+        _record_event(
+            "image_convert",
+            True,
+            "jpeg converted to png for Linux clipboard compatibility",
+            ip=client_ip,
+            session=sess,
+            size=len(image_data),
+        )
 
     # --- Copy to clipboard ---
     try:
