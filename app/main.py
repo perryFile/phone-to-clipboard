@@ -369,7 +369,7 @@ async def pair_page(request: Request) -> HTMLResponse:
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <meta name="theme-color" content="#111"/>
-  <title>AirDrop Linux — Pair</title>
+    <title>phoneToClipboard — Pair</title>
   <style>
     *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
     body{{
@@ -399,9 +399,9 @@ async def pair_page(request: Request) -> HTMLResponse:
   </style>
 </head>
 <body>
-  <h1>📷 AirDrop Linux</h1>
+    <h1>📷 phoneToClipboard</h1>
   <p>Tap the button below to open the app with your pairing token.</p>
-  <a class="open-btn" href="{url}">Open AirDrop Linux</a>
+    <a class="open-btn" href="{url}">Open phoneToClipboard</a>
   <p class="url-box">{url}</p>
 </body>
 </html>
@@ -439,7 +439,7 @@ def _print_qr(url: str) -> None:
 # ---------------------------------------------------------------------------
 
 def _parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="airdrop-linux server")
+    p = argparse.ArgumentParser(description="phoneToClipboard server")
     p.add_argument("--host", default="0.0.0.0", help="Bind host (default: 0.0.0.0)")
     p.add_argument("--port", type=int, default=8765, help="Bind port (default: 8765)")
     p.add_argument("--ssl-keyfile", default=None, help="Path to TLS private key")
@@ -482,7 +482,7 @@ def main() -> None:
     mdns_pair_url = f"{scheme}://{mdns_host}:{args.port}/pair" if mdns_host else None
 
     print("\n" + "=" * 60, flush=True)
-    print("  airdrop-linux — scan the QR code on your iPhone", flush=True)
+    print("  phoneToClipboard — scan the QR code on your iPhone", flush=True)
     print("=" * 60 + "\n", flush=True)
     if mdns_url and mdns_host and lan_ip != "127.0.0.1":
         _print_qr(mdns_url)

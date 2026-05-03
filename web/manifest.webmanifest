@@ -1,7 +1,7 @@
 {
-  "name": "AirDrop Linux",
-  "short_name": "AirDrop",
-  "description": "Send a photo from iPhone to your Linux clipboard over Wi-Fi",
+  "name": "phoneToClipboard",
+  "short_name": "phoneToClipboard",
+  "description": "Send photos and text from your phone to your clipboard over local network",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#111111",

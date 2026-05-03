@@ -21,6 +21,8 @@ Point your phone camera at the QR code, tap the shutter button, and the image la
 - Linux: `wl-clipboard` (Wayland) **or** `xclip` (X11)
 - Windows: nothing extra — PowerShell is used
 
+> Windows support is currently **in progress**. Core flows work for many setups, but edge cases are still being polished.
+
 Install system clipboard tool if needed:
 
 ```bash
@@ -88,6 +90,8 @@ Your phone and computer must be on the **same Wi-Fi network**.
 ## Windows tutorial (download + run)
 
 Follow this on a Windows PC.
+
+> Status: **in progress**. If something fails, open an issue with the exact error so we can improve Windows compatibility quickly.
 
 1. Install Git: https://git-scm.com/download/win
 2. Install Python 3.11+ (check **Add Python to PATH**): https://www.python.org/downloads/windows/
@@ -192,7 +196,7 @@ PYTHONPATH= .venv/bin/pytest tests/ -q
 |----------|-------------------|
 | Linux — Wayland | `wl-copy` |
 | Linux — X11 | `xclip` |
-| Windows | PowerShell `Set-Clipboard` |
+| Windows (in progress) | PowerShell `Set-Clipboard` |
 
 ---
 

@@ -6,7 +6,7 @@
  * the current token after an OS swap.
  */
 
-const CACHE_NAME = "airdrop-linux-v2";
+const CACHE_NAME = "phone-to-clipboard-v3";
 
 // Assets that make up the app shell
 const SHELL_ASSETS = [
